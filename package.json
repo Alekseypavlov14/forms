@@ -1,0 +1,31 @@
+{
+  "name": "@oleksii-pavlov/forms",
+  "version": "1.0.0",
+  "description": "The form utils",
+  "main": "./build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alekseypavlov14/forms"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "jest ./src/tests --watchAll",
+    "build": "tsc"
+  },
+  "keywords": [
+    "Forms",
+    "Validation"
+  ],
+  "author": "Oleksii Pavlov <aleshapavlov9@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@oleksii-pavlov/deep-merge": "^1.2.3"
+  }
+}
