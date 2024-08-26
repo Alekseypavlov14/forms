@@ -1,8 +1,12 @@
 import { ValidationConfig } from './types/validation-config'
 import { FormErrors } from './types/form-errors'
+import { deepMerge } from '@oleksii-pavlov/deep-merge'
 import { AnyForm } from './types/any-form'
 
-export function createFormValidator<T extends AnyForm>(config: Partial<ValidationConfig<T>>) {
+export function createFormValidator<T extends AnyForm>(
+  config: Partial<ValidationConfig<T>> = {},
+  callback?: (data: T) => FormErrors<T>
+) {
   return (data: T) => {
     const errors: FormErrors<T> = {} as FormErrors<T>
 
@@ -16,6 +20,10 @@ export function createFormValidator<T extends AnyForm>(config: Partial<Validatio
       }
     })
 
-    return errors
+    const callbackErrors: FormErrors<T> = callback 
+      ? callback(data)
+      : {} as FormErrors<T>
+
+    return deepMerge(errors, callbackErrors)
   }
 }

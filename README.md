@@ -1,15 +1,7 @@
-# `@oleksii-pavlov/forms` - library to validate forms
-
-## Installation
-
-```bash
-npm i @oleksii-pavlov/forms
-```
-
-### `createFormValidator` Function Documentation
+### `createFormValidator` Function Documentation (Updated)
 
 #### **Purpose**:
-The `createFormValidator` function is a utility that generates a validation function for a given form configuration. The generated function validates form data based on the provided validation rules and returns a collection of errors if any fields fail validation.
+The `createFormValidator` function generates a validation function for a given form configuration. The generated function validates form data based on the provided validation rules and returns a collection of errors if any fields fail validation. Optionally, it allows the integration of a custom validation callback.
 
 #### **Type Definitions**:
 - **`T extends AnyForm`**: The generic type `T` represents the form data structure.
@@ -18,9 +10,10 @@ The `createFormValidator` function is a utility that generates a validation func
 
 #### **Parameters**:
 - **`config: Partial<ValidationConfig<T>>`**: A partial configuration object defining validation rules for each form field. Each field in the configuration is a function that takes the field's value and returns a boolean indicating whether the value is valid.
+- **`callback?: (data: T) => FormErrors<T>`**: An optional callback function that performs additional validation on the form data and returns an object containing error messages for any fields that fail validation.
 
 #### **Returns**:
-- **`(data: T) => FormErrors<T>`**: A function that takes form data as input and returns an object containing error messages for fields that failed validation. If a field is valid, no error message is added for that field.
+- **`(data: T) => FormErrors<T>`**: A function that takes form data as input and returns an object containing error messages for fields that failed validation. If a field is valid, no error message is added for that field. Errors from the optional callback function are merged with the errors from the configuration validation.
 
 #### **Example Usage**:
 
@@ -39,22 +32,25 @@ const config: Partial<ValidationConfig<MyForm>> = {
   password: hasMinLength(6),
 }
 
-const validateForm = createFormValidator<MyForm>(config)
+const validateForm = createFormValidator<MyForm>(config, (data) => ({
+  password: data.password === '123' ? 'Password is invalid' : undefined
+}))
 
 const formData: MyForm = {
   username: "us",
   email: "invalidemail",
-  password: "123",
+  password: "123456",
 }
 
 const errors = validateForm(formData)
 console.log(errors)
-// Output: { username: 'username field is invalid', email: 'email field is invalid', password: 'password field is invalid' }
+// Output: { username: 'username field is invalid', email: 'email field is invalid', password: 'Password is too weak' }
 ```
 
 #### **Explanation**:
 - The `createFormValidator` function iterates over the form data fields using `Object.keys`. For each field, it checks if there is a corresponding validation function in the configuration.
 - If the field has a validation function and the validation fails, an error message is added to the `errors` object, specifying that the field is invalid.
+- If a `callback` is provided, it is called with the form data, and any errors returned by the callback are merged with the errors from the configuration validation.
 - The function returns the `errors` object, which contains error messages for any fields that failed validation.
 
 
