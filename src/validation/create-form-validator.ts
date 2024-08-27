@@ -21,7 +21,7 @@ export function createFormValidator<T extends AnyForm>(
     })
     
     const callbacksErrors: FormErrors<T>[] = callbacks.map(callback => callback(data) || {})
-    const mergedCallbacksErrors = deepMerge<FormErrors<T>>(...callbacksErrors)
+    const mergedCallbacksErrors = deepMerge<FormErrors<T>>({}, ...callbacksErrors)
     
     return deepMerge(errors, mergedCallbacksErrors)
   }
