@@ -5,11 +5,11 @@ import { AnyForm } from './types/any-form'
 
 export function createFormValidator<T extends AnyForm>(
   config: Partial<ValidationConfig<T>> = {},
-  callback?: (data: T) => FormErrors<T>
+  ...callbacks: ((data: T) => Partial<FormErrors<T>> | undefined)[]
 ) {
   return (data: T) => {
-    const errors: FormErrors<T> = {} as FormErrors<T>
-
+    const errors: Partial<FormErrors<T>> = {}
+    
     Object.keys(data).forEach(key => {
       const validator = config[key]
 
@@ -19,11 +19,30 @@ export function createFormValidator<T extends AnyForm>(
         errors[key as keyof T] = `${key} field is invalid`
       }
     })
-
-    const callbackErrors: FormErrors<T> = callback 
-      ? callback(data)
-      : {} as FormErrors<T>
-
-    return deepMerge(errors, callbackErrors)
+    
+    const callbacksErrors: Partial<FormErrors<T>>[] = callbacks.map(callback => callback(data) || {})
+    const mergedCallbacksErrors = deepMerge<Partial<FormErrors<T>>>(...callbacksErrors)
+    
+    return deepMerge(errors, mergedCallbacksErrors)
   }
+}
+
+import { hasMinLength, isEmail } from './rules'
+
+interface MyForm {
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+const validateMyForm = createFormValidator<MyForm>({
+  email: isEmail,
+  password: hasMinLength(6),
+}, comparePasswords)
+
+function comparePasswords(data: MyForm): Partial<FormErrors<MyForm>> | undefined {
+  if (data.password !== data.confirmPassword) return ({
+    password: 'Password is not valid',
+    confirmPassword: 'Password is not valid',
+  })
 }

@@ -18,33 +18,37 @@ The `createFormValidator` function generates a validation function for a given f
 #### **Example Usage**:
 
 ```typescript
-import { createFormValidator, ValidationConfig, hasMinLength, isEmail } from '@oleksii-pavlov/forms'
+import { createFormValidator, hasMinLength, isEmail, FormErrors } from '@oleksii-pavlov/forms'
 
 interface MyForm {
-  username: string
   email: string
   password: string
+  confirmPassword: string
 }
 
-const config: Partial<ValidationConfig<MyForm>> = {
-  username: hasMinLength(3),
+const validateMyForm = createFormValidator<MyForm>({
   email: isEmail,
   password: hasMinLength(6),
+}, comparePasswords)
+
+function comparePasswords(data: MyForm): Partial<FormErrors<MyForm>> | undefined {
+  if (data.password !== data.confirmPassword) return ({
+    password: 'Password is not valid',
+    confirmPassword: 'Password is not valid',
+  })
 }
 
-const validateForm = createFormValidator<MyForm>(config, (data) => ({
-  password: data.password === '123' ? 'Password is invalid' : undefined
-}))
+// client code
 
 const formData: MyForm = {
-  username: "us",
-  email: "invalidemail",
-  password: "123456",
+  email: 'a@gmail.com',
+  password: 'password1',
+  confirmPassword: 'password2'
 }
 
-const errors = validateForm(formData)
+const errors = validateMyForm(formData)
 console.log(errors)
-// Output: { username: 'username field is invalid', email: 'email field is invalid', password: 'Password is too weak' }
+// Output: { password: 'Password is not valid', confirmPassword: 'Password is not valid' }
 ```
 
 #### **Explanation**:
@@ -80,10 +84,8 @@ interface MyForm {
   password: string
 }
 
-const errors: FormErrors<MyForm> = {
+const errors: Partial<FormErrors<MyForm>> = {
   username: 'username field is invalid',
-  email: '',
-  password: ''
 }
 
 const isValid = isFormValid(errors)
