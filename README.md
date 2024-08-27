@@ -31,7 +31,7 @@ const validateMyForm = createFormValidator<MyForm>({
   password: hasMinLength(6),
 }, comparePasswords)
 
-function comparePasswords(data: MyForm): Partial<FormErrors<MyForm>> | undefined {
+function comparePasswords(data: MyForm): FormErrors<MyForm> | undefined {
   if (data.password !== data.confirmPassword) return ({
     password: 'Password is not valid',
     confirmPassword: 'Password is not valid',
@@ -84,7 +84,7 @@ interface MyForm {
   password: string
 }
 
-const errors: Partial<FormErrors<MyForm>> = {
+const errors: FormErrors<MyForm> = {
   username: 'username field is invalid',
 }
 
