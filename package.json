@@ -1,6 +1,6 @@
 {
   "name": "@oleksii-pavlov/forms",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "The form utils",
   "main": "./build/index.js",
   "repository": {
