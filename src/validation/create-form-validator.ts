@@ -10,7 +10,7 @@ export function createFormValidator<T extends AnyForm>(
   return (data: T) => {
     const errors: FormErrors<T> = {}
     
-    Object.keys(data).forEach(key => {
+    Object.keys(config).forEach(key => {
       const validator = config[key]
 
       if (!validator) return 
@@ -23,6 +23,6 @@ export function createFormValidator<T extends AnyForm>(
     const callbacksErrors: FormErrors<T>[] = callbacks.map(callback => callback(data) || {})
     const mergedCallbacksErrors = deepMerge<FormErrors<T>>({}, ...callbacksErrors)
     
-    return deepMerge(errors, mergedCallbacksErrors)
+    return deepMerge<FormErrors<T>>(errors, mergedCallbacksErrors)
   }
 }
